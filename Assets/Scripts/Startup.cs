@@ -14,13 +14,21 @@ public class Startup : MonoBehaviour {
     public int PulseNum;
     public float SlideUpPlayerNumSpeed;
 
+    //[HideInInspector]
+    public int NumberOfPlayers;
+
     private bool IsWaitingToStart;
     private bool IsShowHint;
     private float _hintTimer;
     private Color _hintColor;
     private int _repeatCount;
+    private string CurrentStep;
 
     void Start () {
+        CurrentStep = "Start";
+
+        NumberOfPlayers = 0;
+
         IsWaitingToStart = true;
         _hintColor = PlayButtonHint.GetColor();
         _hintColor.a = 0;
@@ -28,20 +36,41 @@ public class Startup : MonoBehaviour {
 
         Vector3 pos = new Vector3(-0.7f, -5.5f, 18f);
         NumPlayersSelect.transform.localPosition = pos;
+
+        GameBoard.SetActive(false);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        DoStartHint();
+        switch(CurrentStep)
+        {
+            case "Start":
+                DoStartHint();
+                break;
+            case "SlideUp":
+
+                break;
+            case "ChooseNumber":
+                if (NumberOfPlayers > 0)
+                {
+                    StartCoroutine(ShowGameboard());
+                }
+                break;
+        }
 	}
 
     public void StartGame()
     {
+        CurrentStep = "SlideUp";
         IsWaitingToStart = false;
         StartButton.SetActive(false);
 
         NumPlayersSelect.SetActive(true);
         StartCoroutine(SlideUpPlayerNum());
+    }
+    public void SelectNumberOfPlayers(int NumPlayers)
+    {
+        this.NumberOfPlayers = NumPlayers;
     }
 
     IEnumerator PulseHint()
@@ -90,7 +119,20 @@ public class Startup : MonoBehaviour {
             NumPlayersSelect.transform.localPosition = pos;
             yield return null;
         }
-        //something here?
+
+        CurrentStep = "ChooseNumber";
+    }
+    IEnumerator ShowGameboard()
+    {
+        Vector3 pos = NumPlayersSelect.transform.position;
+        while (pos.y > -6.0f)
+        {
+            pos = new Vector3(pos.x, pos.y - (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
+            NumPlayersSelect.transform.localPosition = pos;
+            yield return null;
+        }
+
+        CurrentStep = "Ready";
     }
 
     private void DoStartHint()
