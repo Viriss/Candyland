@@ -34,8 +34,11 @@ public class Startup : MonoBehaviour {
         _hintColor.a = 0;
         PlayButtonHint.SetColor(_hintColor);
 
-        Vector3 pos = new Vector3(-0.7f, -5.5f, 18f);
+        Vector3 pos = new Vector3(-0.7f, -6.5f, 18f);
         NumPlayersSelect.transform.localPosition = pos;
+
+        pos = new Vector3(0, 7, 0);
+        GameBoard.transform.localPosition = pos;
 
         GameBoard.SetActive(false);
     }
@@ -55,6 +58,11 @@ public class Startup : MonoBehaviour {
                 {
                     StartCoroutine(ShowGameboard());
                 }
+                break;
+            case "StartEngine":
+                Engine e = GameBoard.GetComponent<Engine>();
+                e.GameState = "Start";
+                CurrentStep = "GameStarted";
                 break;
         }
 	}
@@ -113,7 +121,7 @@ public class Startup : MonoBehaviour {
     IEnumerator SlideUpPlayerNum()
     {
         Vector3 pos = NumPlayersSelect.transform.position;
-        while(pos.y < -3.0f)
+        while(pos.y < -3.5f)
         {
             pos = new Vector3(pos.x, pos.y + (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
             NumPlayersSelect.transform.localPosition = pos;
@@ -125,14 +133,36 @@ public class Startup : MonoBehaviour {
     IEnumerator ShowGameboard()
     {
         Vector3 pos = NumPlayersSelect.transform.position;
-        while (pos.y > -6.0f)
+        Color col = new Color(1, 1, 1, 1);
+        Renderer bdRenderer = Backdrop.GetComponent<Renderer>();
+
+        while (pos.y > -10.0f)
         {
             pos = new Vector3(pos.x, pos.y - (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
             NumPlayersSelect.transform.localPosition = pos;
+
+            if (col.a > 0.5f)
+            {
+                col.a -= Time.deltaTime;
+                bdRenderer.material.color = col;
+            }
+
             yield return null;
         }
 
-        CurrentStep = "Ready";
+        GameBoard.SetActive(true);
+        pos = GameBoard.transform.position;
+        while(pos.y > 0)
+        {
+
+            pos = new Vector3(pos.x, pos.y - (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
+            GameBoard.transform.localPosition = pos;
+
+            yield return null;
+        }
+
+
+        CurrentStep = "StartEngine";
     }
 
     private void DoStartHint()
