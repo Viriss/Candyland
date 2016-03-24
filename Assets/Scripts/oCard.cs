@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
-public class oCard : MonoBehaviour
+public class oCard 
 {
-
+    public TileColor Color;
+    public int Number;
 
 
 }

@@ -37,7 +37,7 @@ public class Startup : MonoBehaviour {
         Vector3 pos = new Vector3(-0.7f, -6.5f, 18f);
         NumPlayersSelect.transform.localPosition = pos;
 
-        pos = new Vector3(0, 7, 0);
+        pos = new Vector3(0, 3, 0);
         GameBoard.transform.localPosition = pos;
 
         GameBoard.SetActive(false);
@@ -56,13 +56,14 @@ public class Startup : MonoBehaviour {
             case "ChooseNumber":
                 if (NumberOfPlayers > 0)
                 {
+                    CurrentStep += "__Started";
                     StartCoroutine(ShowGameboard());
                 }
                 break;
             case "StartEngine":
+                CurrentStep = "GameStarted";
                 Engine e = GameBoard.GetComponent<Engine>();
                 e.GameState = "Start";
-                CurrentStep = "GameStarted";
                 break;
         }
 	}
@@ -152,14 +153,26 @@ public class Startup : MonoBehaviour {
 
         GameBoard.SetActive(true);
         pos = GameBoard.transform.position;
-        while(pos.y > 0)
+        float _time = 0;
+        Vector3 _home = new Vector3(0, 0, 1);
+
+        while (_time < 2)
         {
-
-            pos = new Vector3(pos.x, pos.y - (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
+            pos = GameBoard.transform.position;
+            pos = Vector3.Lerp(pos, _home, _time / 2.0f);
             GameBoard.transform.localPosition = pos;
-
+            _time += Time.deltaTime;
             yield return null;
         }
+
+        //while(pos.y > 0)
+        //{
+
+        //    pos = new Vector3(pos.x, pos.y - (SlideUpPlayerNumSpeed * Time.deltaTime), pos.z);
+        //    GameBoard.transform.localPosition = pos;
+
+        //    yield return null;
+        //}
 
 
         CurrentStep = "StartEngine";
